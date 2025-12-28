@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: analysis-service
+  
+  # Database Configuration
+  datasource:
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/analysis_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+
+server:
+  port: 8051
+
+# External service URLs
+service:
+  transaction:
+    url: ${TRANSACTION_SERVICE_URL:http://localhost:8082}
+  account:
+    url: ${ACCOUNT_SERVICE_URL:http://localhost:8081}
+  invoice:
+    url: ${INVOICE_SERVICE_URL:http://localhost:8084}
+
+# Analysis threshold configuration
+analysis:
+  threshold:
+    minimum-history-for-dynamic: 10
+    full-history-threshold: 20
+    micro-transaction-limit: 50
+    large-transaction-multiplier: 3.0
+    default-average-amount: 500
+    velocity-spike-threshold: 0.5
+    new-receiver-threshold: 0.3
+    micro-transaction-count-threshold: 5
+    off-hours-threshold: 0.4
+    round-amount-threshold: 0.5
+
+# Gemini AI Configuration
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:your-gemini-api-key-here}
+
+# Feign client configuration
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 5000
+        read-timeout: 10000
+        logger-level: basic
+
+# Logging configuration
+logging:
+  pattern:
+    console: '%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%-5level) %clr([%X{traceId}]){yellow} %clr(%logger{36}){cyan} - %msg%n'
+  level:
+    com.modernbank.analyze_service: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
