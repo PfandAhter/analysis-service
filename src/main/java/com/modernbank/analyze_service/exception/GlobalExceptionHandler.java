@@ -1,5 +1,8 @@
 package com.modernbank.analyze_service.exception;
 
+import com.modernbank.analyze_service.api.response.BaseResponse;
+import com.modernbank.analyze_service.constant.HeaderKey;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +35,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
     }
 
+
+    @ExceptionHandler({RemoteDirectException.class})
+    public ResponseEntity<BaseResponse> handleBusinessException(RemoteDirectException e, HttpServletRequest request) {
+        logError(e, request);
+
+        return ResponseEntity.status(e.getHttpStatus()).body(createRemoteDirectErrorResponseBody(e.getOriginalErrorCode(), e.getOriginalMessage()));
+    }
+
     @ExceptionHandler(AnalysisException.class)
     public ResponseEntity<Map<String, Object>> handleAnalysisException(AnalysisException ex) {
         log.error("Analysis error: {}", ex.getMessage(), ex);
@@ -54,5 +65,15 @@ public class GlobalExceptionHandler {
         response.put("timestamp", LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    private BaseResponse createRemoteDirectErrorResponseBody(String error, String description) {
+        return new BaseResponse("FAILED", error, description);
+    }
+
+    private void logError(Exception exception, HttpServletRequest httpServletRequest) {
+        log.error("TraceId {} got error, Error: {} ",
+                httpServletRequest.getHeader(HeaderKey.CORRELATION_ID),
+                exception.getMessage());
     }
 }
