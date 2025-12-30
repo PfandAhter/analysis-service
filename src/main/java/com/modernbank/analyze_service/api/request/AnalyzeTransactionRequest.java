@@ -1,13 +1,10 @@
 package com.modernbank.analyze_service.api.request;
 
 import com.modernbank.analyze_service.model.enums.AnalyzeRange;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
