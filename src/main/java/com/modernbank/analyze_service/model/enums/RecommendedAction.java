@@ -7,5 +7,6 @@ public enum RecommendedAction {
     ALLOW,
     REVIEW,
     HOLD,
-    BLOCK
+    BLOCK,
+    APPROVE
 }
