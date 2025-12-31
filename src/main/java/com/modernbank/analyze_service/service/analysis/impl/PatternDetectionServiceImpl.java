@@ -122,6 +122,7 @@ public class PatternDetectionServiceImpl implements PatternDetectionService {
 
         if (increase > thresholdConfig.getVelocitySpikeThreshold()) {
             List<String> affectedIds = current.stream()
+                    .filter(e -> e.getTransaction() != null && e.getTransaction().getTransactionId() != null)
                     .map(e -> e.getTransaction().getTransactionId())
                     .collect(Collectors.toList());
 
@@ -161,7 +162,7 @@ public class PatternDetectionServiceImpl implements PatternDetectionService {
 
         for (EnrichedTransaction enriched : current) {
             Transaction tx = enriched.getTransaction();
-            if (tx != null && tx.getReceiverIban() != null) {
+            if (tx != null && tx.getReceiverIban() != null && tx.getTransactionId() != null) {
                 if (!previousReceivers.contains(tx.getReceiverIban())) {
                     newReceiverTxIds.add(tx.getTransactionId());
                     newReceiverIbans.add(tx.getReceiverIban());
@@ -197,10 +198,12 @@ public class PatternDetectionServiceImpl implements PatternDetectionService {
             if (tx != null && tx.getAmount() != null &&
                     tx.getAmount().compareTo(threshold) < 0) {
 
-                String dayKey = tx.getCreatedAt() != null ? tx.getCreatedAt().toLocalDate().toString() : "unknown";
+                if (tx.getTransactionId() != null) {
+                    String dayKey = tx.getCreatedAt() != null ? tx.getCreatedAt().toLocalDate().toString() : "unknown";
 
-                microTxByDay.computeIfAbsent(dayKey, k -> new ArrayList<>())
-                        .add(tx.getTransactionId());
+                    microTxByDay.computeIfAbsent(dayKey, k -> new ArrayList<>())
+                            .add(tx.getTransactionId());
+                }
             }
         }
 
@@ -239,7 +242,7 @@ public class PatternDetectionServiceImpl implements PatternDetectionService {
 
         for (EnrichedTransaction enriched : transactions) {
             Transaction tx = enriched.getTransaction();
-            if (tx != null && tx.getAmount() != null &&
+            if (tx != null && tx.getAmount() != null && tx.getTransactionId() != null &&
                     tx.getAmount().compareTo(threshold) > 0) {
                 outlierIds.add(tx.getTransactionId());
             }
@@ -275,7 +278,7 @@ public class PatternDetectionServiceImpl implements PatternDetectionService {
                 boolean isOffHours = time.isBefore(LocalTime.of(9, 0)) ||
                         time.isAfter(LocalTime.of(18, 0));
 
-                if (isWeekend || isOffHours) {
+                if ((isWeekend || isOffHours) && tx.getTransactionId() != null) {
                     offHoursIds.add(tx.getTransactionId());
                 }
             }
@@ -307,7 +310,7 @@ public class PatternDetectionServiceImpl implements PatternDetectionService {
                 BigDecimal amount = tx.getAmount();
                 // Check if amount is a round number (divisible by 100 with no remainder)
                 if (amount.remainder(new BigDecimal("100")).compareTo(BigDecimal.ZERO) == 0 &&
-                        amount.compareTo(BigDecimal.ZERO) > 0) {
+                        amount.compareTo(BigDecimal.ZERO) > 0 && tx.getTransactionId() != null) {
                     roundAmountIds.add(tx.getTransactionId());
                 }
             }

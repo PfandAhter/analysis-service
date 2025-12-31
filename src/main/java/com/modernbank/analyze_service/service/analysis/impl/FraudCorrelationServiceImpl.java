@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modernbank.analyze_service.client.model.EnrichedTransaction;
 import com.modernbank.analyze_service.client.model.FraudEvaluation;
+import com.modernbank.analyze_service.client.model.Transaction;
 import com.modernbank.analyze_service.config.FeatureNameMapper;
 import com.modernbank.analyze_service.model.dto.FraudCorrelationResult;
 import com.modernbank.analyze_service.model.enums.RiskLevel;
@@ -49,7 +50,10 @@ public class FraudCorrelationServiceImpl implements FraudCorrelationService {
 
             // Track high risk transactions
             if (fraud.getRiskLevel() == RiskLevel.HIGH) {
-                highRiskTransactionIds.add(enriched.getTransaction().getTransactionId());
+                Transaction tx = enriched.getTransaction();
+                if (tx != null && tx.getTransactionId() != null) {
+                    highRiskTransactionIds.add(tx.getTransactionId());
+                }
             }
 
             // Parse and aggregate feature importance
