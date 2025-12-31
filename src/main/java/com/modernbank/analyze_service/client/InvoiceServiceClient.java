@@ -16,7 +16,7 @@ import static com.modernbank.analyze_service.constant.HeaderKey.*;
 @FeignClient(name = "invoice-service", url = "${service.invoice.url}")
 public interface InvoiceServiceClient {
 
-    @PostMapping("/api/v1/invoices/generate")
+    @PostMapping("/api/invoices/generate")
     InvoiceResponse generateInvoice(
             @RequestBody DynamicInvoiceRequest request,
             @RequestHeader(USER_ID) String userId,
