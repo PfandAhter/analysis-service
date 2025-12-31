@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class AnalysisReportModel {
-    private Long id;
+    private String id;
     private String accountId;
     private String invoiceId;
     private String analysisRange;
