@@ -103,7 +103,6 @@ public class AnalysisOrchestrator implements AnalysisOrchestrationService {
                 patterns,
                 fraudResult);
 
-        // Step 9: Save analysis report to database
         AnalysisReportEntity savedReport = null;
         try {
             savedReport = analysisReportService.save(frontendResponse, request.getUserId());
@@ -112,10 +111,8 @@ public class AnalysisOrchestrator implements AnalysisOrchestrationService {
         } catch (Exception e) {
             log.error("Failed to save analysis report for user {}: {}",
                     request.getUserId(), e.getMessage());
-            // Continue without failing - analysis result is still valid
         }
 
-        // Step 10: Build invoice payload (include AI summary)
         DynamicInvoiceRequest invoicePayload = invoicePayloadBuilder.build(
                 savedReport.getId() != null ? savedReport.getId() : "N/A",
                 request.getUserId(),
@@ -128,9 +125,7 @@ public class AnalysisOrchestrator implements AnalysisOrchestrationService {
                 accounts,
                 frontendResponse.getAiSummary());
 
-        // Step 11: Call Invoice Service
         InvoiceResponse invoiceResponse = callInvoiceServiceSafely(invoicePayload, request);
-
         log.info("Analysis complete for user {}: risk level = {}, {} patterns detected",
                 request.getUserId(), riskLevel, patterns.size());
 
@@ -163,7 +158,13 @@ public class AnalysisOrchestrator implements AnalysisOrchestrationService {
         try {
             log.debug("Fetching account data for user {}", request.getUserId());
 
-            return mapperService.map(accountServiceClient.getAccountsByUserId(new BaseRequest())
+            BaseRequest baseRequest = new BaseRequest();
+
+            baseRequest.setUserId(request.getUserId());
+            baseRequest.setUserEmail(request.getUserEmail());
+            baseRequest.setUserRole(request.getUserRole());
+
+            return mapperService.map(accountServiceClient.getAccountsByUserId(baseRequest)
                             .getAccounts(),
                     Account.class);
         } catch (Exception e) {
@@ -178,12 +179,9 @@ public class AnalysisOrchestrator implements AnalysisOrchestrationService {
             AnalyzeTransactionRequest request) {
         try {
             log.debug("Calling Invoice Service for user {}", request.getUserId());
+            invoicePayload.setUserId(request.getUserId());
 
-            return invoiceServiceClient.generateInvoice(
-                    invoicePayload,
-                    request.getToken(),
-                    request.getCorrelationId());
-
+            return invoiceServiceClient.generateInvoice(invoicePayload);
         } catch (Exception e) {
             log.warn("Failed to call Invoice Service for user {}: {}",
                     request.getUserId(), e.getMessage());

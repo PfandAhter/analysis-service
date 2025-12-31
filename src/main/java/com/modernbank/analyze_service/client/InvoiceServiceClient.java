@@ -14,17 +14,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @FeignClient(name = "invoice-service", url = "${service.invoice.url}")
 public interface InvoiceServiceClient {
 
-    /**
-     * Requests invoice generation from Invoice Service.
-     *
-     * @param request       The invoice request payload
-     * @param token         Authorization token
-     * @param correlationId Correlation ID for request tracing
-     * @return InvoiceResponse with request ID and estimated completion time
-     */
     @PostMapping("/api/v1/invoices/generate")
-    InvoiceResponse generateInvoice(
-            @RequestBody DynamicInvoiceRequest request,
-            @RequestHeader("Authorization") String token,
-            @RequestHeader("X-Correlation-ID") String correlationId);
+    InvoiceResponse generateInvoice(@RequestBody DynamicInvoiceRequest request);
 }
