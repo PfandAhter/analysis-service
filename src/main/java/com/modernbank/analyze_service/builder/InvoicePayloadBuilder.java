@@ -25,7 +25,6 @@ public class InvoicePayloadBuilder {
 
     private static final String INVOICE_TYPE = "TRANSACTION_ANALYSIS_REPORT";
 
-
     public DynamicInvoiceRequest build(
             String analysisReportId,
             String userId,
@@ -132,13 +131,17 @@ public class InvoicePayloadBuilder {
         Set<String> flagged = new TreeSet<>();
 
         if (fraudResult != null && fraudResult.getHighRiskTransactionIds() != null) {
-            flagged.addAll(fraudResult.getHighRiskTransactionIds());
+            fraudResult.getHighRiskTransactionIds().stream()
+                    .filter(Objects::nonNull)
+                    .forEach(flagged::add);
         }
 
         if (patterns != null) {
             for (DetectedPattern pattern : patterns) {
                 if (pattern.getAffectedTransactionIds() != null) {
-                    flagged.addAll(pattern.getAffectedTransactionIds());
+                    pattern.getAffectedTransactionIds().stream()
+                            .filter(Objects::nonNull)
+                            .forEach(flagged::add);
                 }
             }
         }
