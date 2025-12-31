@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import static com.modernbank.analyze_service.constant.HeaderKey.*;
+
 /**
  * Feign client for Invoice Service.
  * Sends analysis report generation requests after analysis is complete.
@@ -15,5 +17,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface InvoiceServiceClient {
 
     @PostMapping("/api/v1/invoices/generate")
-    InvoiceResponse generateInvoice(@RequestBody DynamicInvoiceRequest request);
+    InvoiceResponse generateInvoice(
+            @RequestBody DynamicInvoiceRequest request,
+            @RequestHeader(USER_ID) String userId,
+            @RequestHeader(USER_ROLE) String role,
+            @RequestHeader(AUTHORIZATION_TOKEN) String token
+    );
 }

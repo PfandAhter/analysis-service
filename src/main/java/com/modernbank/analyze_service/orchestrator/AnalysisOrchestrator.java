@@ -188,7 +188,12 @@ public class AnalysisOrchestrator implements AnalysisOrchestrationService {
             log.debug("Calling Invoice Service for user {}", request.getUserId());
             invoicePayload.setUserId(request.getUserId());
 
-            return invoiceServiceClient.generateInvoice(invoicePayload);
+            return invoiceServiceClient.generateInvoice(
+                    invoicePayload,
+                    request.getUserId(),
+                    request.getUserRole(),
+                    request.getToken()
+            );
         } catch (Exception e) {
             log.warn("Failed to call Invoice Service for user {}: {}",
                     request.getUserId(), e.getMessage());
