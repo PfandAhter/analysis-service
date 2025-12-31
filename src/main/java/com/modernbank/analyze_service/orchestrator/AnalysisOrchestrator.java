@@ -137,7 +137,10 @@ public class AnalysisOrchestrator implements AnalysisOrchestrationService {
             log.debug("Fetching transaction data for user {}", request.getUserId());
 
             TransactionAnalyzeModel result = transactionServiceClient.getTransactionsForAnalysis(
-                    mapperService.map(request, AnalyzeTransactionRequest.class)
+                    mapperService.map(request, AnalyzeTransactionRequest.class),
+                    request.getUserId(),
+                    request.getUserRole(),
+                    request.getToken()
             );
 
             if (result == null) {
