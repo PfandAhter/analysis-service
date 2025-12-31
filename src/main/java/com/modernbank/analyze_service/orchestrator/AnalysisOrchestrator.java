@@ -164,7 +164,11 @@ public class AnalysisOrchestrator implements AnalysisOrchestrationService {
             baseRequest.setUserEmail(request.getUserEmail());
             baseRequest.setUserRole(request.getUserRole());
 
-            return mapperService.map(accountServiceClient.getAccountsByUserId(baseRequest)
+            return mapperService.map(accountServiceClient.getAccountsByUserId(
+                                    baseRequest,
+                                    request.getUserId(),
+                                    request.getUserRole(),
+                                    request.getToken())
                             .getAccounts(),
                     Account.class);
         } catch (Exception e) {
