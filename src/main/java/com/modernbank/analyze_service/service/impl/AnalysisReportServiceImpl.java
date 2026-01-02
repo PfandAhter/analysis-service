@@ -41,8 +41,8 @@ public class AnalysisReportServiceImpl implements AnalysisReportService {
     @Transactional
     @Override
     public void updateInvoiceId(UpdateInvoiceIdRequest request) {
-        AnalysisReportEntity report = findByInvoiceId(request.getInvoiceId()).orElseThrow(
-                () -> new IllegalArgumentException("No analysis report found with invoice ID: " + request.getInvoiceId()) // TODO: Update this.
+        AnalysisReportEntity report = findByInvoiceId(request.getAnalysisReportId()).orElseThrow(
+                () -> new IllegalArgumentException("No analysis report found with invoice ID: " + request.getAnalysisReportId()) // TODO: Update this.
         );
 
         log.info("Updated invoice ID to {} for analysis report ID: {}", request.getInvoiceId(), request.getAnalysisReportId());
